@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Asistencia y Pizarra — 3ERO INF C | U.E. Dr. Enrique Noboa Arízaga</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input {
+      font-family: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app-shell {
+      max-width: 768px;
+      margin: 0 auto;
+      padding-bottom: 104px;
+    }
+
+    /* Header */
+    .app-header {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 16px 16px 14px;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.18);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .header-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #fcd34d;
+    }
+
+    .offline-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      text-transform: none;
+      letter-spacing: normal;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .header-title {
+      margin: 4px 0 0;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #ffffff;
+    }
+
+    .header-subtitle {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .btn-reset {
+      flex-shrink: 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background-color: #1e293b;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-reset:active {
+      transform: scale(0.96);
+      background-color: #334155;
+    }
+
+    /* Export / Backup bar */
+    .backup-section {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #1e293b;
+    }
+
+    .backup-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    .saved-status {
+      color: #6ee7b7;
+      font-weight: 700;
+    }
+
+    .backup-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    @media (min-width: 600px) {
+      .backup-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .btn-tool {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: none;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    .btn-tool:active {
+      transform: scale(0.97);
+    }
+    .btn-csv { background-color: #059669; color: #ffffff; }
+    .btn-json-save { background-color: #4f46e5; color: #ffffff; }
+    .btn-json-load { background-color: #f59e0b; color: #0f172a; }
+    .btn-print { background-color: #2563eb; color: #ffffff; }
+
+    /* Scale bar for Lección / Pizarra */
+    .scale-bar {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .scale-bar-title {
+      font-weight: 800;
+      color: #fcd34d;
+    }
+
+    .scale-inputs-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scale-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #0f172a;
+      padding: 4px 7px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+    }
+
+    .scale-chip input {
+      width: 44px;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 12px;
+      text-align: right;
+      outline: none;
+    }
+
+    .lbl-ep { font-weight: 800; color: #34d399; }
+    .lbl-bp { font-weight: 800; color: #38bdf8; }
+    .lbl-dp { font-weight: 800; color: #fcd34d; }
+    .lbl-np { font-weight: 800; color: #fb7185; }
+
+    /* Warning banner if opened in restricted WebView */
+    .storage-warning {
+      margin: 12px 12px 0;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background-color: #fef3c7;
+      border: 2px solid #f59e0b;
+      color: #78350f;
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    /* Sections */
+    .section-wrap {
+      margin-top: 12px;
+      padding: 0 12px;
+    }
+
+    .card-box {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    }
+
+    /* Date navigator */
+    .date-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .btn-nav-arrow {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      font-size: 22px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .btn-nav-arrow:active {
+      transform: scale(0.95);
+      background-color: #e2e8f0;
+    }
+
+    .date-title-wrap {
+      text-align: center;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .active-date-label {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .active-date-sub {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .date-strip {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .date-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .date-chip {
+      flex-shrink: 0;
+      min-height: 54px;
+      min-width: 68px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      background-color: #f8fafc;
+      color: #334155;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+    .date-chip.is-marked {
+      background-color: #ecfdf5;
+      border-color: #6ee7b7;
+      color: #064e3b;
+    }
+    .date-chip.is-holiday {
+      background-color: #fffbeb;
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+    .date-chip.is-active {
+      background-color: #0f172a;
+      border-color: #0f172a;
+      color: #ffffff;
+    }
+
+    .date-chip-short {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .date-chip-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background-color: #ffffff;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+    .date-chip.is-active .date-chip-badge {
+      background-color: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+    .date-chip.is-holiday .date-chip-badge {
+      background-color: #fde68a;
+      color: #78350f;
+      border-color: #fcd34d;
+    }
+
+    /* Live counters */
+    .counters-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .counter-pill {
+      border-radius: 12px;
+      padding: 6px 2px;
+      border: 1px solid #e2e8f0;
+    }
+    .counter-pill-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .counter-pill-val {
+      font-size: 17px;
+      font-weight: 800;
+      margin-top: 1px;
+    }
+
+    .cp-p { background-color: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+    .cp-f { background-color: #fff1f2; border-color: #fecdd3; color: #be123c; }
+    .cp-a { background-color: #fffbeb; border-color: #fde68a; color: #b45309; }
+    .cp-j { background-color: #f0f9ff; border-color: #bae6fd; color: #0369a1; }
+    .cp-u { background-color: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+
+    /* Bulk actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-bulk {
+      min-height: 46px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .btn-bulk:active {
+      transform: scale(0.98);
+    }
+    .btn-all-p {
+      background-color: #059669;
+      color: #ffffff;
+      border: none;
+    }
+    .btn-clear-day {
+      background-color: #f1f5f9;
+      color: #334155;
+      border: 1.5px solid #cbd5e1;
+    }
+
+    .holiday-banner {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      background-color: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #78350f;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* Search box */
+    .search-wrap {
+      position: relative;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #64748b;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 42px 10px 38px;
+      border-radius: 14px;
+      border: 1.5px solid #cbd5e1;
+      background-color: #ffffff;
+      color: #0f172a;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+    }
+    .btn-clear-search {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: none;
+      background-color: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Student list & cards */
+    .student-list {
+      margin-top: 12px;
+      padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .student-card {
+      background-color: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .student-card.state-P { background-color: #f0fdf4; border-color: #6ee7b7; }
+    .student-card.state-F { background-color: #fff1f2; border-color: #fda4af; }
+    .student-card.state-A { background-color: #fffbeb; border-color: #fcd34d; }
+    .student-card.state-J { background-color: #f0f9ff; border-color: #7dd3fc; }
+    .student-card.is-retired {
+      background-color: #fefce8;
+      border-color: #facc15;
+    }
+
+    .student-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .student-ident {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .student-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background-color: #0f172a;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .student-card.is-retired .student-num {
+      background-color: #ca8a04;
+      color: #ffffff;
+    }
+
+    .student-name {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .retired-tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background-color: #fef08a;
+      border: 1px solid #eab308;
+      color: #854d0e;
+      font-size: 10px;
+      font-weight: 800;
+      vertical-align: middle;
+    }
+
+    .student-stats {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .pct-badge {
+      flex-shrink: 0;
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+    .pct-high { background-color: #d1fae5; color: #065f46; }
+    .pct-mid  { background-color: #fef3c7; color: #92400e; }
+    .pct-low  { background-color: #ffe4e6; color: #9f1239; }
+    .pct-ret  { background-color: #fef08a; color: #854d0e; border: 1px solid #eab308; }
+
+    /* Touch buttons P F A J */
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .code-btn {
+      min-height: 48px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      background-color: #f8fafc;
+      color: #334155;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.05;
+      cursor: pointer;
+      user-select: none;
+    }
+    .code-btn:active {
+      transform: scale(0.95);
+    }
+    .code-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+    .code-btn-main {
+      font-size: 16px;
+    }
+    .code-btn-sub {
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+
+    .code-btn.active-P {
+      background-color: #059669;
+      border-color: #047857;
+      color: #ffffff;
+      box-shadow: 0 2px 5px rgba(5, 150, 105, 0.35);
+    }
+    .code-btn.active-F {
+      background-color: #e11d48;
+      border-color: #be123c;
+      color: #ffffff;
+      box-shadow: 0 2px 5px rgba(225, 29, 72, 0.35);
+    }
+    .code-btn.active-A {
+      background-color: #f59e0b;
+      border-color: #d97706;
+      color: #0f172a;
+      box-shadow: 0 2px 5px rgba(245, 158, 11, 0.35);
+    }
+    .code-btn.active-J {
+      background-color: #0284c7;
+      border-color: #0369a1;
+      color: #ffffff;
+      box-shadow: 0 2px 5px rgba(2, 132, 199, 0.35);
+    }
+
+    /* Board / Lección section inside student card */
+    .board-section {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .board-status {
+      color: #4338ca;
+      font-weight: 800;
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .board-btn {
+      min-height: 42px;
+      padding: 4px 4px;
+      border-radius: 10px;
+      border: 1.5px solid #cbd5e1;
+      background-color: #f8fafc;
+      color: #334155;
+      font-size: 10.5px;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.15;
+      cursor: pointer;
+      user-select: none;
+    }
+    .board-btn:active {
+      transform: scale(0.95);
+    }
+    .board-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+    .board-btn.is-picked {
+      background-color: #4f46e5;
+      border-color: #4338ca;
+      color: #ffffff;
+      box-shadow: 0 2px 5px rgba(79, 70, 229, 0.35);
+    }
+    .board-pts {
+      font-size: 9.5px;
+      font-weight: 700;
+      opacity: 0.85;
+      margin-top: 1px;
+    }
+
+    /* Toast notification */
+    .toast-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translate(-50%, 16px);
+      z-index: 60;
+      width: 92%;
+      max-width: 420px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .toast-bar.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    .toast-content {
+      background-color: #0f172a;
+      color: #ffffff;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    .toast-badge {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background-color: rgba(16, 185, 129, 0.22);
+      color: #6ee7b7;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      background-color: rgba(15, 23, 42, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-box {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 18px;
+      max-width: 380px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .modal-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .modal-desc {
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.45;
+    }
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .btn-modal-cancel {
+      min-height: 46px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-modal-accept {
+      min-height: 46px;
+      border-radius: 12px;
+      border: none;
+      background-color: #e11d48;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Print sheet (hidden on screen) */
+    .print-only {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 8mm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+        padding: 4px;
+      }
+      .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #1e293b;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+      }
+      .print-inst {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .print-sub {
+        font-size: 9px;
+        font-weight: 600;
+        color: #334155;
+      }
+      .print-right {
+        text-align: right;
+        font-size: 9px;
+        font-weight: 700;
+      }
+      table.print-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 6.1pt;
+        line-height: 1.04;
+      }
+      table.print-table th,
+      table.print-table td {
+        border: 0.6pt solid #475569;
+        padding: 1.1px 2px;
+        text-align: center;
+      }
+      table.print-table th {
+        background-color: #e2e8f0;
+      }
+      table.print-table th.student-col,
+      table.print-table td.student-col {
+        text-align: left;
+        white-space: nowrap;
+        padding-left: 4px;
+      }
+      table.print-table tr.retired-row td {
+        background-color: #fef9c3 !important;
+        color: #713f12;
+      }
+      .print-sub-board {
+        font-size: 4.7pt;
+        color: #3730a3;
+        font-weight: 800;
+      }
+      .print-footer {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 8.5px;
+        font-weight: 600;
+        color: #334155;
+      }
+      .print-signs {
+        display: flex;
+        gap: 36px;
+        padding-right: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app-shell" class="no-print app-shell">
+    <header class="app-header">
+      <div class="header-top">
+        <div class="header-info">
+          <div class="header-meta">
+            <span>U.E. "Dr. Enrique Noboa Arízaga"</span>
+            <span>•</span>
+            <span>2026–2027</span>
+            <span class="offline-pill">
+              <span>●</span>
+              <span>100% Sin Internet</span>
+            </span>
+          </div>
+          <h1 class="header-title">Asistencia y Pizarra — 3ro Informática "C"</h1>
+          <p class="header-subtitle">Matemática • 3er Trimestre (Solo Jueves) • Msc. Edwin Lliguipuma E.</p>
+        </div>
+        <button id="btn-reset-data" type="button" class="btn-reset">Reiniciar</button>
+      </div>
+
+      <div class="backup-section">
+        <div class="backup-top">
+          <span>🏠 Guardar / Exportar al llegar a casa</span>
+          <span id="last-saved-indicator" class="saved-status">Listo sin conexión</span>
+        </div>
+        <div class="backup-grid">
+          <button id="btn-export-csv" type="button" class="btn-tool btn-csv">
+            <span>📊</span><span>CSV (Excel)</span>
+          </button>
+          <button id="btn-save-json" type="button" class="btn-tool btn-json-save">
+            <span>💾</span><span>Respaldo .JSON</span>
+          </button>
+          <button id="btn-import-json" type="button" class="btn-tool btn-json-load">
+            <span>📂</span><span>Importar .JSON</span>
+          </button>
+          <button id="btn-print-horizontal" type="button" class="btn-tool btn-print">
+            <span>🖨️</span><span>Imprimir Horiz.</span>
+          </button>
+        </div>
+
+        <!-- Escala editable Cualitativo -> Cuantitativo (Lección / Pizarra) -->
+        <div class="scale-bar">
+          <span class="scale-bar-title">✏️ Lección/Pizarra (Cuali → Cuanti):</span>
+          <div class="scale-inputs-row">
+            <label class="scale-chip">
+              <span class="lbl-ep">EP</span>
+              <input id="scale-EP" type="number" step="0.1" min="0" max="10" />
+            </label>
+            <label class="scale-chip">
+              <span class="lbl-bp">BP</span>
+              <input id="scale-BP" type="number" step="0.1" min="0" max="10" />
+            </label>
+            <label class="scale-chip">
+              <span class="lbl-dp">DP</span>
+              <input id="scale-DP" type="number" step="0.1" min="0" max="10" />
+            </label>
+            <label class="scale-chip">
+              <span class="lbl-np">NP</span>
+              <input id="scale-NP" type="number" step="0.1" min="0" max="10" />
+            </label>
+          </div>
+        </div>
+
+        <input id="input-import-json" type="file" accept=".json,application/json" class="hidden" />
+      </div>
+    </header>
+
+    <!-- Aviso automático si se abrió en un visor restringido en vez de Chrome -->
+    <div id="storage-warning" class="storage-warning hidden">
+      ⚠️ Abriste este archivo en un visor previo restringido. Para que los datos queden guardados permanentemente en tu celular, toca los 3 puntos (⋮) arriba a la derecha y elige <b>"Abrir con Chrome"</b> (o guarda un <b>Respaldo .JSON</b>).
+    </div>
+
+    <!-- Selector horizontal de fechas -->
+    <section class="section-wrap">
+      <div class="card-box">
+        <div class="date-nav">
+          <button id="btn-prev-date" type="button" aria-label="Fecha anterior" class="btn-nav-arrow">‹</button>
+          <div class="date-title-wrap">
+            <div id="active-date-label" class="active-date-label">Jueves 26/11/2026</div>
+            <div id="active-date-sub" class="active-date-sub">Sesión activa • Tercer Trimestre (Solo Jueves)</div>
+          </div>
+          <button id="btn-next-date" type="button" aria-label="Fecha siguiente" class="btn-nav-arrow">›</button>
+        </div>
+        <div id="date-strip" class="date-strip"></div>
+      </div>
+    </section>
+
+    <!-- Contadores + Acciones rápidas -->
+    <section class="section-wrap">
+      <div class="card-box">
+        <div class="counters-grid">
+          <div class="counter-pill cp-p">
+            <div class="counter-pill-label">Presentes</div>
+            <div id="count-p" class="counter-pill-val">0</div>
+          </div>
+          <div class="counter-pill cp-f">
+            <div class="counter-pill-label">Faltas</div>
+            <div id="count-f" class="counter-pill-val">0</div>
+          </div>
+          <div class="counter-pill cp-a">
+            <div class="counter-pill-label">Atrasos</div>
+            <div id="count-a" class="counter-pill-val">0</div>
+          </div>
+          <div class="counter-pill cp-j">
+            <div class="counter-pill-label">Justif.</div>
+            <div id="count-j" class="counter-pill-val">0</div>
+          </div>
+          <div class="counter-pill cp-u">
+            <div class="counter-pill-label">Sin mar.</div>
+            <div id="count-u" class="counter-pill-val">31</div>
+          </div>
+        </div>
+
+        <div id="quick-actions" class="quick-actions">
+          <button id="btn-all-p" type="button" class="btn-bulk btn-all-p">
+            <span>✓</span><span>Todos P (Presentes)</span>
+          </button>
+          <button id="btn-clear-day" type="button" class="btn-bulk btn-clear-day">
+            <span>✕</span><span>Limpiar día</span>
+          </button>
+        </div>
+
+        <div id="holiday-banner" class="holiday-banner hidden">
+          🎉 Feriado Nacional. No se registran asistencias en esta fecha.
+        </div>
+      </div>
+    </section>
+
+    <!-- Buscador -->
+    <section class="section-wrap">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Buscar estudiante por nombre o N.º..."
+          class="search-input"
+        />
+        <button id="btn-clear-search" type="button" aria-label="Borrar búsqueda" class="btn-clear-search hidden">✕</button>
+      </div>
+    </section>
+
+    <!-- Lista de estudiantes -->
+    <main id="student-list" class="student-list"></main>
+  </div>
+
+  <!-- Vista impresión -->
+  <section id="print-sheet" class="print-only">
+    <div class="print-header">
+      <div>
+        <div class="print-inst">UNIDAD EDUCATIVA "DR. ENRIQUE NOBOA ARÍZAGA" — LA TRONCAL, CAÑAR, ECUADOR</div>
+        <div class="print-sub">Año Lectivo: 2026–2027 • Tercer Trimestre • 3ro Informática "C" (3ERO INF C) • Asignatura: Matemática • Horario: Solo Jueves</div>
+      </div>
+      <div class="print-right">
+        <div>Docente: Msc. Edwin Lliguipuma E.</div>
+        <div id="print-sessions-count">Asistencia + Pizarra (Jueves)</div>
+      </div>
+    </div>
+    <div id="print-table-container"></div>
+    <div class="print-footer">
+      <div>Asistencia: <b>P</b>=Presente, <b>F</b>=Falta, <b>A</b>=Atraso, <b>J</b>=Justif., <b>RET</b>=Retirado, <b>FER</b>=Feriado | Pizarra: <b>EP</b>, <b>BP</b>, <b>DP</b>, <b>NP</b></div>
+      <div class="print-signs">
+        <span>____________________________<br/>Docente: Msc. Edwin Lliguipuma E.</span>
+        <span>____________________________<br/>Visto Bueno Vicerrectorado</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast -->
+  <div id="toast-bar" class="no-print toast-bar">
+    <div class="toast-content">
+      <span id="toast-message">Guardado automáticamente</span>
+      <span id="toast-badge" class="toast-badge">OK</span>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="confirm-modal" class="no-print modal-backdrop hidden">
+    <div class="modal-box">
+      <h2 id="confirm-title" class="modal-title">¿Confirmar acción?</h2>
+      <p id="confirm-desc" class="modal-desc">Esta acción modificará los registros actuales.</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel" type="button" class="btn-modal-cancel">Cancelar</button>
+        <button id="confirm-accept" type="button" class="btn-modal-accept">Sí, continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var STORAGE_KEY = 'asistencia_pizarra_3ero_inf_c_3t_2026_2027_v1';
+      var memoryFallback = {};
+      var storageAvailable = true;
+
+      var DEFAULT_SCALE = {
+        EP: 10.0,
+        BP: 8.5,
+        DP: 6.5,
+        NP: 4.0
+      };
+
+      function testStorage() {
+        try {
+          var k = '__test_ls_piz_inf_c__';
+          window.localStorage.setItem(k, '1');
+          window.localStorage.removeItem(k);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      storageAvailable = testStorage();
+
+      function readStore(key) {
+        if (storageAvailable) {
+          try {
+            return window.localStorage.getItem(key);
+          } catch (e) {
+            storageAvailable = false;
+          }
+        }
+        return memoryFallback[key] || null;
+      }
+
+      function writeStore(key, val) {
+        memoryFallback[key] = val;
+        if (storageAvailable) {
+          try {
+            window.localStorage.setItem(key, val);
+            return true;
+          } catch (e) {
+            storageAvailable = false;
+          }
+        }
+        return false;
+      }
+
+      var STUDENTS = [
+        { num: 1, name: 'BORJA CAICEDO SAMUEL JOHAN', phone: '', retired: false },
+        { num: 2, name: 'CABRERA CEDEÑO ERICK DANIEL', phone: '', retired: false },
+        { num: 3, name: 'CERCADO CARRANZA ANTHONY JAVIER', phone: '', retired: false },
+        { num: 4, name: 'CRUZ RAMIREZ DANIEL ALEJANDRO', phone: '', retired: false },
+        { num: 5, name: 'ESPINOZA BURGOS OSCAR ROBERTO', phone: '', retired: false },
+        { num: 6, name: 'GARCIA PEREZ AMY SCARLETH', phone: '', retired: false },
+        { num: 7, name: 'GUAMBAÑA ROBLES CARLOS ANDRES', phone: '', retired: false },
+        { num: 8, name: 'HURTADO JARA JHERAR MATIAS', phone: '', retired: false },
+        { num: 9, name: 'JEREZ SACTA DOMENICA JASSU', phone: '', retired: false },
+        { num: 10, name: 'LOPEZ GUAIÑA GENESIS SAMANTHA', phone: '', retired: false },
+        { num: 11, name: 'LOPEZ PALAGUACHI FREDERICK PATRICIO', phone: '', retired: false },
+        { num: 12, name: 'MACANCELA PIÑA MARIA TERESA', phone: '', retired: false },
+        { num: 13, name: 'MARTINEZ VERA EDINSON EDUARDO', phone: '', retired: false },
+        { num: 14, name: 'MURILLO VILLA JENNIFER ANDREINA', phone: '', retired: false },
+        { num: 15, name: 'OCHOA BUESTAN MAYKEL FERNANDO', phone: '', retired: false },
+        { num: 16, name: 'ORTIZ ORBES JENNIFER DENISSE', phone: '', retired: false },
+        { num: 17, name: 'PACHECO NARVAEZ IVANNA KATHERINE', phone: '', retired: false },
+        { num: 18, name: 'PIGUAVE LOPEZ TAYRON JOSE', phone: '', retired: false },
+        { num: 19, name: 'PINO GUADALUPE SONIA KERIDHY', phone: '', retired: false },
+        { num: 20, name: 'POROZO CAICEDO ROSA LILIANA', phone: '', retired: false },
+        { num: 21, name: 'QUEZADA GUAILLAS GIANELA ALEJANDRA', phone: '', retired: false },
+        { num: 22, name: 'REMACHE BUÑAY JENIFFER AURORA', phone: '', retired: false },
+        { num: 23, name: 'RIVERA MOSQUERA EDWAR JAN', phone: '', retired: false },
+        { num: 24, name: 'SEGURA PALACIOS JACKSON STEVEN', phone: '', retired: false },
+        { num: 25, name: 'TAPIA BARBOZA JORDY JEFFERSON', phone: '', retired: false },
+        { num: 26, name: 'TAPIA NARANJO KARLA LORENA', phone: '', retired: false },
+        { num: 27, name: 'TOLEDO GRANDA ARACELI BETSAIDA', phone: '', retired: false },
+        { num: 28, name: 'TRIVIÑO ZAMBRANO MELANIE DAYANNA', phone: '', retired: false },
+        { num: 29, name: 'VASQUEZ HERRERA REINA ELIZABETH', phone: '', retired: false },
+        { num: 30, name: 'VELECELA NARANJO MAYKOL ADALBERTO', phone: '', retired: false },
+        { num: 31, name: 'YUCAILLA CHUTO JOHAN ISMAEL', phone: '', retired: false }
+      ];
+
+      // Todos los Jueves del 3er Trimestre (Nov 2026 - Mar 2027)
+      var SESSIONS = [
+        { date: '2026-11-26', short: 'Jue 26/11', full: 'Jueves 26/11/2026', holiday: '' },
+        { date: '2026-12-03', short: 'Jue 03/12', full: 'Jueves 03/12/2026', holiday: '' },
+        { date: '2026-12-10', short: 'Jue 10/12', full: 'Jueves 10/12/2026', holiday: '' },
+        { date: '2026-12-17', short: 'Jue 17/12', full: 'Jueves 17/12/2026', holiday: '' },
+        { date: '2026-12-24', short: 'Jue 24/12', full: 'Jueves 24/12/2026', holiday: '' },
+        { date: '2026-12-31', short: 'Jue 31/12', full: 'Jueves 31/12/2026', holiday: '' },
+        { date: '2027-01-07', short: 'Jue 07/01', full: 'Jueves 07/01/2027', holiday: '' },
+        { date: '2027-01-14', short: 'Jue 14/01', full: 'Jueves 14/01/2027', holiday: '' },
+        { date: '2027-01-21', short: 'Jue 21/01', full: 'Jueves 21/01/2027', holiday: '' },
+        { date: '2027-01-28', short: 'Jue 28/01', full: 'Jueves 28/01/2027', holiday: '' },
+        { date: '2027-02-04', short: 'Jue 04/02', full: 'Jueves 04/02/2027', holiday: '' },
+        { date: '2027-02-11', short: 'Jue 11/02', full: 'Jueves 11/02/2027', holiday: '' },
+        { date: '2027-02-18', short: 'Jue 18/02', full: 'Jueves 18/02/2027', holiday: '' },
+        { date: '2027-02-25', short: 'Jue 25/02', full: 'Jueves 25/02/2027', holiday: '' },
+        { date: '2027-03-04', short: 'Jue 04/03', full: 'Jueves 04/03/2027', holiday: '' }
+      ];
+
+      var state = {
+        activeDate: SESSIONS[0].date,
+        attendance: {}, // { 'YYYY-MM-DD': { studentNum: 'P'|'F'|'A'|'J' } }
+        board: {},      // { 'YYYY-MM-DD': { studentNum: 'EP'|'BP'|'DP'|'NP' } }
+        scale: Object.assign({}, DEFAULT_SCALE),
+        search: ''
+      };
+
+      function loadState() {
+        var raw = readStore(STORAGE_KEY);
+        if (!raw) return;
+        try {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            if (parsed.activeDate && SESSIONS.some(function (s) { return s.date === parsed.activeDate; })) {
+              state.activeDate = parsed.activeDate;
+            }
+            if (parsed.attendance && typeof parsed.attendance === 'object') {
+              state.attendance = parsed.attendance;
+            }
+            if (parsed.board && typeof parsed.board === 'object') {
+              state.board = parsed.board;
+            }
+            if (parsed.scale && typeof parsed.scale === 'object') {
+              state.scale = {
+                EP: isFinite(parseFloat(parsed.scale.EP)) ? parseFloat(parsed.scale.EP) : DEFAULT_SCALE.EP,
+                BP: isFinite(parseFloat(parsed.scale.BP)) ? parseFloat(parsed.scale.BP) : DEFAULT_SCALE.BP,
+                DP: isFinite(parseFloat(parsed.scale.DP)) ? parseFloat(parsed.scale.DP) : DEFAULT_SCALE.DP,
+                NP: isFinite(parseFloat(parsed.scale.NP)) ? parseFloat(parsed.scale.NP) : DEFAULT_SCALE.NP
+              };
+            }
+          }
+        } catch (e) {
+          // Ignorar almacenamiento corrupto
+        }
+      }
+
+      function saveState(quiet) {
+        var payload = JSON.stringify({
+          activeDate: state.activeDate,
+          attendance: state.attendance,
+          board: state.board,
+          scale: state.scale,
+          updatedAt: new Date().toISOString()
+        });
+        var ok = writeStore(STORAGE_KEY, payload);
+        var ind = document.getElementById('last-saved-indicator');
+        var now = new Date();
+        var hh = String(now.getHours()).padStart(2, '0');
+        var mm = String(now.getMinutes()).padStart(2, '0');
+        if (ok) {
+          ind.textContent = 'Guardado ' + hh + ':' + mm;
+        } else {
+          ind.textContent = 'Modo temporal (exportar JSON)';
+        }
+        if (!quiet) {
+          showToast('Guardado localmente');
+        }
+      }
+
+      var toastTimer = null;
+      function showToast(msg, badge) {
+        var bar = document.getElementById('toast-bar');
+        document.getElementById('toast-message').textContent = msg;
+        document.getElementById('toast-badge').textContent = badge || 'OK';
+        bar.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          bar.classList.remove('show');
+        }, 2100);
+      }
+
+      function openConfirm(title, desc, onConfirm) {
+        var modal = document.getElementById('confirm-modal');
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-desc').textContent = desc;
+        modal.classList.remove('hidden');
+
+        var btnCancel = document.getElementById('confirm-cancel');
+        var btnAccept = document.getElementById('confirm-accept');
+
+        function cleanup() {
+          modal.classList.add('hidden');
+          btnCancel.onclick = null;
+          btnAccept.onclick = null;
+        }
+
+        btnCancel.onclick = cleanup;
+        btnAccept.onclick = function () {
+          cleanup();
+          onConfirm();
+        };
+      }
+
+      function getActiveSession() {
+        for (var i = 0; i < SESSIONS.length; i++) {
+          if (SESSIONS[i].date === state.activeDate) return SESSIONS[i];
+        }
+        return SESSIONS[0];
+      }
+
+      function getStudentTotals(num) {
+        var p = 0, f = 0, a = 0, j = 0;
+        var boardGrades = [];
+        for (var i = 0; i < SESSIONS.length; i++) {
+          var s = SESSIONS[i];
+          if (s.holiday) continue;
+          var dayAtt = state.attendance[s.date] || {};
+          var code = dayAtt[num];
+          if (code === 'P') p++;
+          else if (code === 'F') f++;
+          else if (code === 'A') a++;
+          else if (code === 'J') j++;
+
+          var dayBoard = state.board[s.date] || {};
+          var bCode = dayBoard[num];
+          if (bCode && state.scale[bCode] !== undefined) {
+            boardGrades.push(state.scale[bCode]);
+          }
+        }
+        var totalMarked = p + f + a + j;
+        var pct = totalMarked > 0 ? Math.round(((p + j + a * 0.5) / totalMarked) * 100) : 100;
+        var boardAvg = null;
+        if (boardGrades.length > 0) {
+          var sum = boardGrades.reduce(function (acc, v) { return acc + v; }, 0);
+          boardAvg = (sum / boardGrades.length).toFixed(2);
+        }
+        return { p: p, f: f, a: a, j: j, totalMarked: totalMarked, pct: pct, boardCount: boardGrades.length, boardAvg: boardAvg };
+      }
+
+      function renderScaleInputs() {
+        ['EP', 'BP', 'DP', 'NP'].forEach(function (k) {
+          var inp = document.getElementById('scale-' + k);
+          if (inp) inp.value = state.scale[k];
+        });
+      }
+
+      function renderDateStrip() {
+        var strip = document.getElementById('date-strip');
+        strip.innerHTML = '';
+        var activeSession = getActiveSession();
+
+        document.getElementById('active-date-label').textContent = activeSession.full;
+        document.getElementById('active-date-sub').textContent = activeSession.holiday
+          ? ('Feriado: ' + activeSession.holiday)
+          : 'Sesión activa • Tercer Trimestre (Solo Jueves)';
+
+        var activeStudentsCount = STUDENTS.filter(function (st) { return !st.retired; }).length;
+
+        SESSIONS.forEach(function (sess) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'date-chip';
+          if (sess.holiday) btn.classList.add('is-holiday');
+          if (sess.date === state.activeDate) btn.classList.add('is-active');
+
+          var dayAtt = state.attendance[sess.date] || {};
+          var markedCount = 0;
+          STUDENTS.forEach(function (st) {
+            if (!st.retired && dayAtt[st.num]) markedCount++;
+          });
+
+          if (!sess.holiday && markedCount > 0) {
+            btn.classList.add('is-marked');
+          }
+
+          var badgeText = sess.holiday ? 'FER' : (markedCount + '/' + activeStudentsCount);
+          btn.innerHTML =
+            '<span class="date-chip-short">' + sess.short + '</span>' +
+            '<span class="date-chip-badge">' + badgeText + '</span>';
+
+          btn.onclick = function () {
+            state.activeDate = sess.date;
+            saveState(true);
+            renderAll();
+          };
+
+          strip.appendChild(btn);
+          if (sess.date === state.activeDate) {
+            setTimeout(function () {
+              btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }, 30);
+          }
+        });
+      }
+
+      function renderCounters() {
+        var sess = getActiveSession();
+        var dayAtt = state.attendance[sess.date] || {};
+        var p = 0, f = 0, a = 0, j = 0, u = 0;
+
+        STUDENTS.forEach(function (st) {
+          if (st.retired) return;
+          var code = dayAtt[st.num];
+          if (code === 'P') p++;
+          else if (code === 'F') f++;
+          else if (code === 'A') a++;
+          else if (code === 'J') j++;
+          else u++;
+        });
+
+        document.getElementById('count-p').textContent = p;
+        document.getElementById('count-f').textContent = f;
+        document.getElementById('count-a').textContent = a;
+        document.getElementById('count-j').textContent = j;
+        document.getElementById('count-u').textContent = u;
+
+        var quick = document.getElementById('quick-actions');
+        var holBanner = document.getElementById('holiday-banner');
+        if (sess.holiday) {
+          quick.classList.add('hidden');
+          holBanner.classList.remove('hidden');
+          holBanner.textContent = '🎉 ' + sess.holiday + '. No se registran asistencias en esta fecha.';
+        } else {
+          quick.classList.remove('hidden');
+          holBanner.classList.add('hidden');
+        }
+      }
+
+      function renderStudentList() {
+        var container = document.getElementById('student-list');
+        container.innerHTML = '';
+        var sess = getActiveSession();
+        var dayAtt = state.attendance[sess.date] || {};
+        var dayBoard = state.board[sess.date] || {};
+        var q = state.search.trim().toLowerCase();
+
+        var filtered = STUDENTS.filter(function (st) {
+          if (!q) return true;
+          return st.name.toLowerCase().indexOf(q) !== -1 || String(st.num) === q;
+        });
+
+        if (filtered.length === 0) {
+          var empty = document.createElement('div');
+          empty.className = 'card-box';
+          empty.style.textAlign = 'center';
+          empty.style.padding = '24px';
+          empty.style.fontWeight = '700';
+          empty.style.color = '#64748b';
+          empty.textContent = 'No se encontraron estudiantes con "' + state.search + '".';
+          container.appendChild(empty);
+          return;
+        }
+
+        filtered.forEach(function (st) {
+          var curCode = dayAtt[st.num] || '';
+          var curBoard = dayBoard[st.num] || '';
+          var totals = getStudentTotals(st.num);
+
+          var card = document.createElement('article');
+          card.className = 'student-card';
+          if (st.retired) {
+            card.classList.add('is-retired');
+          } else if (curCode) {
+            card.classList.add('state-' + curCode);
+          }
+
+          var pctClass = 'pct-high';
+          var pctLabel = totals.pct + '% Asist.';
+          if (st.retired) {
+            pctClass = 'pct-ret';
+            pctLabel = 'RETIRADO';
+          } else if (totals.pct < 75) {
+            pctClass = 'pct-low';
+          } else if (totals.pct < 90) {
+            pctClass = 'pct-mid';
+          }
+
+          var boardStatsHtml = totals.boardAvg !== null
+            ? ' • <span>✏️ Prom. Piz: <b>' + totals.boardAvg + '</b> (' + totals.boardCount + ')</span>'
+            : '';
+
+          var retiredBadgeHtml = st.retired ? '<span class="retired-tag">RETIRADO</span>' : '';
+          var disabledAttr = (st.retired || sess.holiday) ? 'disabled' : '';
+
+          var attButtonsHtml = [
+            { code: 'P', label: 'Presente' },
+            { code: 'F', label: 'Falta' },
+            { code: 'A', label: 'Atraso' },
+            { code: 'J', label: 'Justif.' }
+          ].map(function (opt) {
+            var activeCls = curCode === opt.code ? (' active-' + opt.code) : '';
+            return '<button type="button" class="code-btn' + activeCls + '" data-att="' + opt.code + '" ' + disabledAttr + '>' +
+              '<span class="code-btn-main">' + opt.code + '</span>' +
+              '<span class="code-btn-sub">' + opt.label + '</span>' +
+              '</button>';
+          }).join('');
+
+          var boardStatusText = curBoard
+            ? ('Hoy: ' + curBoard + ' (' + Number(state.scale[curBoard]).toFixed(1) + ' pts)')
+            : 'Sin calificar hoy';
+
+          var boardButtonsHtml = ['EP', 'BP', 'DP', 'NP'].map(function (bKey) {
+            var pickedCls = curBoard === bKey ? ' is-picked' : '';
+            var pts = Number(state.scale[bKey]).toFixed(1);
+            return '<button type="button" class="board-btn' + pickedCls + '" data-board="' + bKey + '" ' + disabledAttr + '>' +
+              '<span>' + bKey + '</span>' +
+              '<span class="board-pts">' + pts + '</span>' +
+              '</button>';
+          }).join('');
+
+          card.innerHTML =
+            '<div class="student-top">' +
+              '<div class="student-ident">' +
+                '<div class="student-num">' + st.num + '</div>' +
+                '<div>' +
+                  '<h3 class="student-name">' + st.name + retiredBadgeHtml + '</h3>' +
+                  '<div class="student-stats">' +
+                    '<span>P:<b>' + totals.p + '</b></span>' +
+                    '<span>F:<b>' + totals.f + '</b></span>' +
+                    '<span>A:<b>' + totals.a + '</b></span>' +
+                    '<span>J:<b>' + totals.j + '</b></span>' +
+                    boardStatsHtml +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<span class="pct-badge ' + pctClass + '">' + pctLabel + '</span>' +
+            '</div>' +
+            '<div class="code-grid">' + attButtonsHtml + '</div>' +
+            '<div class="board-section">' +
+              '<div class="board-header">' +
+                '<span>LECCIÓN / PIZARRA</span>' +
+                '<span class="board-status">' + boardStatusText + '</span>' +
+              '</div>' +
+              '<div class="board-grid">' + boardButtonsHtml + '</div>' +
+            '</div>';
+
+          var attBtns = card.querySelectorAll('[data-att]');
+          attBtns.forEach(function (b) {
+            b.onclick = function () {
+              if (st.retired || sess.holiday) return;
+              var val = b.getAttribute('data-att');
+              if (!state.attendance[sess.date]) state.attendance[sess.date] = {};
+              if (state.attendance[sess.date][st.num] === val) {
+                delete state.attendance[sess.date][st.num];
+              } else {
+                state.attendance[sess.date][st.num] = val;
+              }
+              saveState(false);
+              renderAll();
+            };
+          });
+
+          var brdBtns = card.querySelectorAll('[data-board]');
+          brdBtns.forEach(function (b) {
+            b.onclick = function () {
+              if (st.retired || sess.holiday) return;
+              var val = b.getAttribute('data-board');
+              if (!state.board[sess.date]) state.board[sess.date] = {};
+              if (state.board[sess.date][st.num] === val) {
+                delete state.board[sess.date][st.num];
+              } else {
+                state.board[sess.date][st.num] = val;
+              }
+              saveState(false);
+              renderAll();
+            };
+          });
+
+          container.appendChild(card);
+        });
+      }
+
+      function renderPrintSheet() {
+        var container = document.getElementById('print-table-container');
+        document.getElementById('print-sessions-count').textContent = 'Asistencia + Pizarra (' + SESSIONS.length + ' Sesiones - Jueves)';
+
+        var html = '<table class="print-table"><thead><tr>' +
+          '<th>N.º</th>' +
+          '<th class="student-col">Apellidos y Nombres</th>';
+
+        SESSIONS.forEach(function (s) {
+          html += '<th>' + s.short.replace('Jue ', '') + '</th>';
+        });
+
+        html += '<th>P</th><th>F</th><th>A</th><th>J</th><th>%Asis</th><th>Prom.Piz</th></tr></thead><tbody>';
+
+        STUDENTS.forEach(function (st) {
+          var totals = getStudentTotals(st.num);
+          var rowCls = st.retired ? ' class="retired-row"' : '';
+          html += '<tr' + rowCls + '><td>' + st.num + '</td><td class="student-col">' + st.name + (st.retired ? ' (RET)' : '') + '</td>';
+
+          SESSIONS.forEach(function (s) {
+            if (st.retired) {
+              html += '<td>RET</td>';
+              return;
+            }
+            if (s.holiday) {
+              html += '<td>FER</td>';
+              return;
+            }
+            var aCode = (state.attendance[s.date] || {})[st.num] || '';
+            var bCode = (state.board[s.date] || {})[st.num] || '';
+            var cell = aCode;
+            if (bCode) {
+              cell += (cell ? '<br/>' : '') + '<span class="print-sub-board">' + bCode + '</span>';
+            }
+            html += '<td>' + cell + '</td>';
+          });
+
+          if (st.retired) {
+            html += '<td colspan="6">RETIRADO</td></tr>';
+          } else {
+            html += '<td>' + totals.p + '</td>' +
+              '<td>' + totals.f + '</td>' +
+              '<td>' + totals.a + '</td>' +
+              '<td>' + totals.j + '</td>' +
+              '<td>' + totals.pct + '%</td>' +
+              '<td>' + (totals.boardAvg !== null ? totals.boardAvg : '-') + '</td></tr>';
+          }
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+
+      function renderAll() {
+        renderScaleInputs();
+        renderDateStrip();
+        renderCounters();
+        renderStudentList();
+        renderPrintSheet();
+      }
+
+      // Navegación entre fechas
+      document.getElementById('btn-prev-date').onclick = function () {
+        var idx = SESSIONS.findIndex(function (s) { return s.date === state.activeDate; });
+        if (idx > 0) {
+          state.activeDate = SESSIONS[idx - 1].date;
+          saveState(true);
+          renderAll();
+        }
+      };
+
+      document.getElementById('btn-next-date').onclick = function () {
+        var idx = SESSIONS.findIndex(function (s) { return s.date === state.activeDate; });
+        if (idx < SESSIONS.length - 1) {
+          state.activeDate = SESSIONS[idx + 1].date;
+          saveState(true);
+          renderAll();
+        }
+      };
+
+      // Todos Presentes
+      document.getElementById('btn-all-p').onclick = function () {
+        var sess = getActiveSession();
+        if (sess.holiday) return;
+        if (!state.attendance[sess.date]) state.attendance[sess.date] = {};
+        STUDENTS.forEach(function (st) {
+          if (!st.retired) {
+            state.attendance[sess.date][st.num] = 'P';
+          }
+        });
+        saveState(false);
+        renderAll();
+      };
+
+      // Limpiar día
+      document.getElementById('btn-clear-day').onclick = function () {
+        var sess = getActiveSession();
+        openConfirm(
+          '¿Limpiar registros del ' + sess.full + '?',
+          'Se borrarán las marcas de asistencia y pizarra únicamente de esta fecha.',
+          function () {
+            delete state.attendance[sess.date];
+            delete state.board[sess.date];
+            saveState(false);
+            renderAll();
+          }
+        );
+      };
+
+      // Reiniciar todo
+      document.getElementById('btn-reset-data').onclick = function () {
+        openConfirm(
+          '¿Reiniciar toda la base de datos?',
+          'Se eliminarán todas las asistencias y notas de pizarra guardadas de 3ro Informática "C".',
+          function () {
+            state.attendance = {};
+            state.board = {};
+            state.scale = Object.assign({}, DEFAULT_SCALE);
+            saveState(false);
+            renderAll();
+          }
+        );
+      };
+
+      // Buscador
+      var searchInput = document.getElementById('search-input');
+      var btnClearSearch = document.getElementById('btn-clear-search');
+      searchInput.oninput = function () {
+        state.search = searchInput.value;
+        btnClearSearch.classList.toggle('hidden', !state.search);
+        renderStudentList();
+      };
+      btnClearSearch.onclick = function () {
+        state.search = '';
+        searchInput.value = '';
+        btnClearSearch.classList.add('hidden');
+        renderStudentList();
+      };
+
+      // Escala editable
+      ['EP', 'BP', 'DP', 'NP'].forEach(function (k) {
+        var inp = document.getElementById('scale-' + k);
+        inp.onchange = function () {
+          var v = parseFloat(inp.value);
+          if (isFinite(v) && v >= 0 && v <= 10) {
+            state.scale[k] = v;
+            saveState(false);
+            renderAll();
+          } else {
+            inp.value = state.scale[k];
+          }
+        };
+      });
+
+      // Exportar CSV
+      document.getElementById('btn-export-csv').onclick = function () {
+        var headers = ['N.º', 'Apellidos y Nombres', 'Estado'];
+        SESSIONS.forEach(function (s) {
+          headers.push(s.short + ' (Asis)');
+          headers.push(s.short + ' (Piz)');
+        });
+        headers.push('Total P', 'Total F', 'Total A', 'Total J', '% Asistencia', 'Prom. Pizarra');
+
+        var rows = [headers.join(',')];
+        STUDENTS.forEach(function (st) {
+          var totals = getStudentTotals(st.num);
+          var row = [
+            st.num,
+            '"' + st.name.replace(/"/g, '""') + '"',
+            st.retired ? 'RETIRADO' : 'ACTIVO'
+          ];
+          SESSIONS.forEach(function (s) {
+            if (st.retired) {
+              row.push('RET', 'RET');
+            } else if (s.holiday) {
+              row.push('FER', 'FER');
+            } else {
+              var aCode = (state.attendance[s.date] || {})[st.num] || '';
+              var bCode = (state.board[s.date] || {})[st.num] || '';
+              row.push(aCode, bCode);
+            }
+          });
+          if (st.retired) {
+            row.push('', '', '', '', '', '');
+          } else {
+            row.push(totals.p, totals.f, totals.a, totals.j, totals.pct + '%', totals.boardAvg !== null ? totals.boardAvg : '');
+          }
+          rows.push(row.join(','));
+        });
+
+        var blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'Asistencia_Pizarra_3ERO_INF_C_Jueves.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Archivo CSV descargado', 'CSV');
+      };
+
+      // Respaldo JSON
+      document.getElementById('btn-save-json').onclick = function () {
+        var backup = {
+          course: '3ERO INF C',
+          daySchedule: 'Jueves',
+          exportedAt: new Date().toISOString(),
+          activeDate: state.activeDate,
+          attendance: state.attendance,
+          board: state.board,
+          scale: state.scale
+        };
+        var blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'Respaldo_3ERO_INF_C_' + new Date().toISOString().slice(0, 10) + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Respaldo .JSON descargado', 'JSON');
+      };
+
+      // Importar JSON
+      var inputImport = document.getElementById('input-import-json');
+      document.getElementById('btn-import-json').onclick = function () {
+        inputImport.click();
+      };
+      inputImport.onchange = function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          try {
+            var parsed = JSON.parse(ev.target.result);
+            if (parsed.attendance) state.attendance = parsed.attendance;
+            if (parsed.board) state.board = parsed.board;
+            if (parsed.scale) state.scale = Object.assign({}, DEFAULT_SCALE, parsed.scale);
+            if (parsed.activeDate && SESSIONS.some(function (s) { return s.date === parsed.activeDate; })) {
+              state.activeDate = parsed.activeDate;
+            }
+            saveState(true);
+            renderAll();
+            showToast('Respaldo restaurado correctamente', 'OK');
+          } catch (err) {
+            showToast('Archivo JSON no válido', 'ERROR');
+          }
+          inputImport.value = '';
+        };
+        reader.readAsText(file);
+      };
+
+      // Imprimir Horizontal
+      document.getElementById('btn-print-horizontal').onclick = function () {
+        renderPrintSheet();
+        window.print();
+      };
+
+      // Inicialización
+      if (!storageAvailable) {
+        document.getElementById('storage-warning').classList.remove('hidden');
+      }
+      loadState();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
